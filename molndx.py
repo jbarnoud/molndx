@@ -68,6 +68,9 @@ def write_ndx(groups, outfile, group_filter=None) :
 def ndx_load(infile) :
     """
     Create selections from a gromacs index file.
+
+    :Parameters:
+        - infile : inout file name
     """
     ndx, names = read_ndx(open(infile))
     print names
@@ -92,6 +95,9 @@ def ndx_load(infile) :
 def ndx_save(outfile) :
     """
     Save all the selections into a gromacs index file.
+
+    :Parameters:
+        - outfile : output file name
     """
     group_names = cmd.get_names("selections")
     ndx = {}
