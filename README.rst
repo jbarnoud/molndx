@@ -12,6 +12,7 @@ To load the plugin just type :
     run molndx.py
 
 The plugin gives access to two methods :
-* ndx_save <output_file> : save all selections
-* ndx_load <input_file> : load the selections
+
+- ndx_save <output_file> : save all selections
+- ndx_load <input_file> : load the selections
 
