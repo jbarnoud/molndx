@@ -41,7 +41,14 @@ An index file look like :
 
 __author__ = "Jonathan Barnoud <jonathan@barnoud.net>"
 
-from pymol import cmd
+# If we are in Pymol then we need to load the API
+try :
+    from pymol import cmd
+except (ImportError, KeyError):
+    is_pymol = False
+else :
+    is_pymol = True
+
 from textwrap import wrap
 
 # Life would be easier if python 2.6 would have ordereddict. Then it would have
@@ -107,7 +114,7 @@ def ndx_load(infile) :
     ndx, names = read_ndx(open(infile))
     print names
     for name, content in ((key, ndx[key]) for key in names) :
-        # Pymol do not like & and | characters
+        # Pymol does not like & and | characters
         name = name.replace("&", "_and_")
         name = name.replace("|", "_or_")
         if len(content) > 0 :
@@ -140,6 +147,8 @@ def ndx_save(outfile) :
     write_ndx(ndx, open(outfile, "w"), group_names)
     print "%s written with %i groups in it." % (outfile, len(group_names))
 
-cmd.extend('ndx_load', ndx_load)
-cmd.extend('ndx_save', ndx_save)
+# If we are in Pymol then declare the new commands
+if is_pymol :
+    cmd.extend('ndx_load', ndx_load)
+    cmd.extend('ndx_save', ndx_save)
 
