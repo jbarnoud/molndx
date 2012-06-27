@@ -14,10 +14,27 @@
 
  
 """
-Pymol plugin to handle gromacs index (.ndx) files.
+Pymol plugin to handle GROMACS index (.ndx) files.
 
-This plugin allow to load pymol selections from an index file and to store
-pymol selections into an index file.
+This plugin allow to load Pymol selections from an index file and to store
+Pymol selections into an index file.
+
+A GROMACS index file is a succession of atom groups. Each group is described by
+a header defining the group name and a list of atoms. Lines can be commented
+using the # character. Note that the atoms are numbered starting at 1 in the
+index file.
+
+An index file look like :
+
+    [ group_name ]
+    1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22
+    23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41
+    42 43 44 45
+
+    # This is a commented line
+    [ group_name_2 ]
+    1 2 3 # The end of a line can be commented
+    4 5 6
 """
 
 __author__ = "Jonathan Barnoud <jonathan@barnoud.net>"
@@ -28,17 +45,17 @@ from textwrap import wrap
 # Life would be easier if python 2.6 would have ordereddict. Then it would have
 # been trivial to store groups in the order of reading. However the ordereddict
 # type is only available for python 2.6 through a external library and I don't
-# want any dependancy out of the standard library.
+# want any dependency out of the standard library.
 
 def read_ndx(infile) :
     """
-    Read a gromacs index file and return a dictionnary.
+    Read a GROMACS index file and return a dictionary.
 
     :Parameters:
         - infile : a file descriptor like instance of a ndx file
 
     :Return:
-        - A dictionnary like {group name : list of indices}.
+        - A dictionary like {group name : list of indices}.
         - The list of group names ordered as the input file.
     """
     indices = {}
@@ -58,16 +75,16 @@ def read_ndx(infile) :
 
 def write_ndx(groups, outfile, group_filter=None) :
     """
-    Write a gromacs index file.
+    Write a GROMACS index file.
 
     :Parameters:
-        - groups : a dictionnary with group names as keys and list of indices
+        - groups : a dictionary with group names as keys and list of indices
           as values.
-        - outfile : a file descriptor in which will be writen the indices.
-        - group_filter : a list of keys of the "groups" dictionnary, groups
-          will be writen in this order in the file, only the groups in
-          group_filter will be writen. If group_filter is None (default) all
-          groups are writen in a random order.
+        - outfile : a file descriptor in which will be written the indices.
+        - group_filter : a list of keys of the "groups" dictionary, groups
+          will be written in this order in the file, only the groups in
+          group_filter will be written. If group_filter is None (default) all
+          groups are written in a random order.
     """
     if group_filter is None :
         group_filter = groups.keys()
@@ -80,15 +97,15 @@ def write_ndx(groups, outfile, group_filter=None) :
 
 def ndx_load(infile) :
     """
-    Create selections from a gromacs index file.
+    Create selections from a GROMACS index file.
 
     :Parameters:
-        - infile : inout file name
+        - infile : input file name
     """
     ndx, names = read_ndx(open(infile))
     print names
     for name, content in ((key, ndx[key]) for key in names) :
-        # Pymol do not like & and | charaters
+        # Pymol do not like & and | characters
         name = name.replace("&", "_and_")
         name = name.replace("|", "_or_")
         if len(content) > 0 :
@@ -107,7 +124,7 @@ def ndx_load(infile) :
 
 def ndx_save(outfile) :
     """
-    Save all the selections into a gromacs index file.
+    Save all the selections into a GROMACS index file.
 
     :Parameters:
         - outfile : output file name
@@ -119,7 +136,7 @@ def ndx_save(outfile) :
         cmd.iterate(group, 'indices.append(index)', space=storage)
         ndx[group] = storage['indices']
     write_ndx(ndx, open(outfile, "w"), group_names)
-    print "%s writen with %i groups in it." % (outfile, len(group_names))
+    print "%s written with %i groups in it." % (outfile, len(group_names))
 
 cmd.extend('ndx_load', ndx_load)
 cmd.extend('ndx_save', ndx_save)
