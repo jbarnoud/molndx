@@ -57,7 +57,10 @@ class TestMolndx(TestCase) :
         self.assertEqual(len(groups), 0, "Group name list should be empty.")
 
     def test_read_enpty_group(self) :
-        pass
+        file_name = os.path.join(TEST_DIR, "test_index_empty_group.ndx")
+        index, groups = molndx.read_ndx(open(file_name))
+        self.assertEqual(len(index["group1"]), 0, "Group should be empty.")
+        self.assertEqual(groups[0], "group1", "Group name is wrong.")
 
     def test_read_comments(self) :
         pass

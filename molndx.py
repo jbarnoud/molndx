@@ -77,9 +77,9 @@ def read_ndx(infile) :
             current_group = current_group.replace("]", "")
             current_group = current_group.strip()
             groups.append(current_group)
+            indices[current_group] = []
         elif not current_group is None :
-            indices[current_group] = (indices.get(current_group, []) +
-                                      [int(i) for i in line.split()])
+            indices[current_group] += [int(i) for i in line.split()]
     return indices, groups
 
 def write_ndx(groups, outfile, group_filter=None) :
