@@ -27,7 +27,7 @@ from textwrap import wrap
 
 # Life would be easier if python 2.6 would have ordereddict. Then it would have
 # been trivial to store groups in the order of reading. However the ordereddict
-# type is only available for python 2.5 through a external library and I don't
+# type is only available for python 2.6 through a external library and I don't
 # want any dependancy out of the standard library.
 
 def read_ndx(infile) :
