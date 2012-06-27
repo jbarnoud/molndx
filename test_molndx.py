@@ -48,7 +48,13 @@ class TestMolndx(TestCase) :
                 "Incorrect group name list.")
 
     def test_read_empty_file(self) :
-        pass
+        """
+        Test reading an empty file
+        """
+        file_name = os.path.join(TEST_DIR, "test_index_empty.ndx")
+        index, groups = molndx.read_ndx(open(file_name))
+        self.assertEqual(len(index), 0, "Dictionary should be empty.")
+        self.assertEqual(len(groups), 0, "Group name list should be empty.")
 
     def test_read_enpty_group(self) :
         pass
