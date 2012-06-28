@@ -16,7 +16,8 @@
 Unit tests for the molndx module.
 """
 
-import os.path
+import os
+import tempfile
 from unittest import TestCase, main
 from copy import copy
 
@@ -89,11 +90,61 @@ class TestMolndx(TestCase) :
         file_name = os.path.join(TEST_DIR, "test_index_comment_inline.ndx")
         self.check_content(file_name, self.read_reference, self.group_reference)
 
-    def test_write(self) :
-        pass
+    def test_read_write_no_groups(self) :
+        """
+        Test if the writing works when no group filter is provided.
 
-    def test_read_write(self) :
-        pass
+        It is assumed that reading works. But there is enough tests above to
+        assume that, isn't it ?
+        """
+        tmp = tempfile.mkstemp()[1]
+        with open(tmp, "w") as doc :
+            molndx.write_ndx(self.read_reference, doc)
+        index, groups = molndx.read_ndx(open(tmp))
+        self.assertEqual(index, self.read_reference,
+                "Dictionary do not match. See %s." % tmp)
+        groups.sort()
+        self.assertEqual(groups, self.group_reference,
+                "Group list do not match. See %s." % tmp)
+        # The temporary file is deleted only if the test pass
+        os.remove(tmp)
+
+    def test_read_write_all_groups(self) :
+        """
+        Test if the writing works when all the groups are provided.
+
+        It is assumed that reading works. But there is enough tests above to
+        assume that, isn't it ?
+        """
+        tmp = tempfile.mkstemp()[1]
+        with open(tmp, "w") as doc :
+            molndx.write_ndx(self.read_reference, doc, self.group_reference)
+        index, groups = molndx.read_ndx(open(tmp))
+        self.assertEqual(index, self.read_reference,
+                "Dictionary do not match. See %s." % tmp)
+        self.assertEqual(groups, self.group_reference,
+                "Group list do not match. See %s." % tmp)
+        # The temporary file is deleted only if the test pass
+        os.remove(tmp)
+
+    def test_read_write_extra_groups(self) :
+        """
+        Test if the writing works when to many groups are provided.
+
+        It is assumed that reading works. But there is enough tests above to
+        assume that, isn't it ?
+        """
+        tmp = tempfile.mkstemp()[1]
+        groups = copy(self.group_reference) + ["group3"]
+        with open(tmp, "w") as doc :
+            molndx.write_ndx(self.read_reference, doc, groups)
+        index, groups = molndx.read_ndx(open(tmp))
+        self.assertEqual(index, self.read_reference,
+                "Dictionary do not match. See %s." % tmp)
+        self.assertEqual(groups, self.group_reference,
+                "Group list do not match. See %s." % tmp)
+        # The temporary file is deleted only if the test pass
+        os.remove(tmp)
 
 
 if __name__ == "__main__" :
