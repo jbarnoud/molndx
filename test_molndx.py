@@ -146,6 +146,71 @@ class TestMolndx(TestCase) :
         # The temporary file is deleted only if the test pass
         os.remove(tmp)
 
+class TestPlugin(TestCase) :
+    def test_run(self) :
+        """
+        In python, load the plugin.
+        """
+        tmp = tempfile.mkstemp(suffix=".pml")[1]
+        with open(tmp, "w") as pml :
+            print >> pml, "run molndx.py"
+            print >> pml, "quit"
+        status = os.system("pymol -c %s" % tmp)
+        self.assertEqual(status, 0, "Problem in loading the plugin in Pymol.")
+        os.remove(tmp)
+
+    def test_write(self) :
+        """
+        In python, do some selections and write them.
+        """
+        tmp = tempfile.mkstemp(suffix=".pml")[1]
+        tmp_ndx = tempfile.mkstemp()[1]
+        with open(tmp, "w") as pml :
+            print >> pml, "load %s/1BTA.pdb" % TEST_DIR
+            print >> pml, "select res1, resid 1"
+            print >> pml, "select res2, resid 20"
+            print >> pml, "run molndx.py"
+            print >> pml, "ndx_save %s" % tmp_ndx
+            print >> pml, "quit"
+        status = os.system("pymol -c %s" % tmp)
+        index, groups = molndx.read_ndx(open(tmp_ndx))
+        ref_index, ref_groups = molndx.read_ndx(
+                open(os.path.join(TEST_DIR, "ref_1BTA.ndx")))
+        self.assertEqual(index, ref_index, 
+                "Dictionary does not match. See index %s and pml %s." % (
+                    tmp_ndx, tmp))
+        self.assertEqual(groups, ref_groups,
+                "Group list does not match. See index %s and pml %s." % (
+                    tmp_ndx, tmp))
+        os.remove(tmp_ndx)
+        os.remove(tmp)
+
+    
+    def test_load_write(self) :
+        """
+        In python, load a file, write the selection and check consistency.
+        """
+        tmp = tempfile.mkstemp(suffix=".pml")[1]
+        tmp_ndx = tempfile.mkstemp()[1]
+        with open(tmp, "w") as pml :
+            print >> pml, "load %s/1BTA.pdb" % TEST_DIR
+            print >> pml, "run molndx.py"
+            print >> pml, "ndx_load %s" % os.path.join(TEST_DIR, "ref_1BTA.ndx")
+            print >> pml, "ndx_save %s" % tmp_ndx
+            print >> pml, "quit"
+        status = os.system("pymol -c %s" % tmp)
+        index, groups = molndx.read_ndx(open(tmp_ndx))
+        ref_index, ref_groups = molndx.read_ndx(
+                open(os.path.join(TEST_DIR, "ref_1BTA.ndx")))
+        self.assertEqual(index, ref_index, 
+                "Dictionary does not match. See index %s and pml %s." % (
+                    tmp_ndx, tmp))
+        self.assertEqual(groups, ref_groups,
+                "Group list does not match. See index %s and pml %s." % (
+                    tmp_ndx, tmp))
+        os.remove(tmp_ndx)
+        os.remove(tmp)
+
 
 if __name__ == "__main__" :
     main()

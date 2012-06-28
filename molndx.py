@@ -144,6 +144,10 @@ def ndx_save(outfile) :
         storage = {'indices' : []}
         cmd.iterate(group, 'indices.append(index)', space=storage)
         ndx[group] = storage['indices']
+    # Pymol will likely have a "sele" group. If this group is empty we do not
+    # want it in the output file.
+    if "sele" in ndx and len(ndx["sele"]) == 0 :
+        del ndx["sele"]
     write_ndx(ndx, open(outfile, "w"), group_names)
     print "%s written with %i groups in it." % (outfile, len(group_names))
 
