@@ -46,8 +46,10 @@ class TestMolndx(TestCase) :
             - reference_list: the group list to compare with
         """
         index, groups = molndx.read_ndx(open(infile))
-        self.assertEqual(index, reference_dict, "Incorrect group dictionary.")
-        self.assertEqual(groups, reference_list, "Incorrect group name list.")
+        self.assertEqual(index, reference_dict,
+                "Incorrect group dictionary.\n%s" % str(index))
+        self.assertEqual(groups, reference_list,
+                "Incorrect group name list.\n%s" % str(groups))
 
     def test_read_regular(self) :
         """

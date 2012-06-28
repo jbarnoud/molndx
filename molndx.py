@@ -71,6 +71,10 @@ def read_ndx(infile) :
     current_group = None
     groups = []
     for line in infile :
+        # Remove comments if any
+        comment_start = line.find(";")
+        if comment_start > -1 :
+            line = line[:comment_start]
         if "[" in line :
             current_group = line
             current_group = current_group.replace("[", "")
