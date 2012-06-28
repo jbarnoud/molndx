@@ -82,7 +82,7 @@ class TestMolndx(TestCase) :
         file_name = os.path.join(TEST_DIR, "test_index_comment_lines.ndx")
         self.check_content(file_name, self.read_reference, self.group_reference)
 
-    def test_read_comment_lines(self) :
+    def test_read_comment_inline(self) :
         """
         Test reading in presence of comment lines
         """
