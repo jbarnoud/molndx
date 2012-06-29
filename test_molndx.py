@@ -185,7 +185,7 @@ class TestPlugin(TestCase) :
             print >> pml, "run molndx.py"
             print >> pml, "ndx_save %s" % tmp_ndx
             print >> pml, "quit"
-        status = pymol(tmp)
+        pymol(tmp)
         index, groups = molndx.read_ndx(open(tmp_ndx))
         ref_index, ref_groups = molndx.read_ndx(
                 open(os.path.join(TEST_DIR, "ref_1BTA.ndx")))
@@ -211,7 +211,7 @@ class TestPlugin(TestCase) :
             print >> pml, "ndx_load %s" % os.path.join(TEST_DIR, "ref_1BTA.ndx")
             print >> pml, "ndx_save %s" % tmp_ndx
             print >> pml, "quit"
-        status = pymol(tmp)
+        pymol(tmp)
         index, groups = molndx.read_ndx(open(tmp_ndx))
         ref_index, ref_groups = molndx.read_ndx(
                 open(os.path.join(TEST_DIR, "ref_1BTA.ndx")))
