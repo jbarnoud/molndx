@@ -27,6 +27,9 @@ import molndx
 TEST_DIR = "test_resources"
 
 class TestMolndx(TestCase) :
+    """
+    Run tests for molndx as a module.
+    """
     def setUp(self) :
         self.read_reference = {
             "group1" : range(1, 100),
@@ -150,6 +153,9 @@ class TestMolndx(TestCase) :
         os.remove(tmp)
 
 class TestPlugin(TestCase) :
+    """
+    Run tests for molndx in the context of Pymol.
+    """
     def test_run(self) :
         """
         In python, load the plugin.
@@ -176,6 +182,7 @@ class TestPlugin(TestCase) :
             print >> pml, "ndx_save %s" % tmp_ndx
             print >> pml, "quit"
         status = pymol(tmp)
+        self.assertEqual(status, 0, "Pymol exit status is not 0.")
         index, groups = molndx.read_ndx(open(tmp_ndx))
         ref_index, ref_groups = molndx.read_ndx(
                 open(os.path.join(TEST_DIR, "ref_1BTA.ndx")))
@@ -202,6 +209,7 @@ class TestPlugin(TestCase) :
             print >> pml, "ndx_save %s" % tmp_ndx
             print >> pml, "quit"
         status = pymol(tmp)
+        self.assertEqual(status, 0, "Pymol exit status is not 0.")
         index, groups = molndx.read_ndx(open(tmp_ndx))
         ref_index, ref_groups = molndx.read_ndx(
                 open(os.path.join(TEST_DIR, "ref_1BTA.ndx")))
