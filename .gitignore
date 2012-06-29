@@ -8,3 +8,6 @@
 *.swp
 *.out
 
+# coverage.py
+htmlcov/*
+.coverage
