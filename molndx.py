@@ -41,14 +41,6 @@ An index file look like :
 
 __author__ = "Jonathan Barnoud <jonathan@barnoud.net>"
 
-# If we are in Pymol then we need to load the API
-try :
-    from pymol import cmd
-except (ImportError, KeyError):
-    is_pymol = False
-else :
-    is_pymol = True
-
 from textwrap import wrap
 
 # Life would be easier if python 2.6 would have ordereddict. Then it would have
@@ -108,58 +100,62 @@ def write_ndx(groups, outfile, group_filter=None) :
         indices = " ".join((str(x) for x in groups[group]))
         print >> outfile, "\n".join(wrap(indices, width=60))
 
-def ndx_load(infile) :
-    """
-    Create selections from a GROMACS index file.
+if __name__ == "pymol" :
+    # Do all the things that are Pymol specific
 
-    :Parameters:
-        - infile : input file name
-    """
-    ndx, names = read_ndx(open(infile))
-    print names
-    for name, content in ((key, ndx[key]) for key in names) :
-        # Pymol does not like & and | characters
-        name = name.replace("&", "_and_")
-        name = name.replace("|", "_or_")
-        if len(content) > 0 :
-            print "Selection of %s" % name
-            # Pymol does not like long selection strings so I select the group
-            # iteratively
-            cmd.select(name, "index %i" % content[0])
-            subcontents = (content[i:i+10] for i in xrange(1, len(content), 10))
-            for subcontent in subcontents :
-                selstring = "index " + "+".join(str(i) for i in subcontent)
-                cmd.select(name, "%s | %s" % (name, selstring))
-        else :
-            print "Group %s is empty" % name
-    cmd.select("none")
-    print "Loading of %s done" % infile
+    from pymol import cmd
+    def ndx_load(infile) :
+        """
+        Create selections from a GROMACS index file.
 
-def ndx_save(outfile) :
-    """
-    Save all the selections into a GROMACS index file.
+        :Parameters:
+            - infile : input file name
+        """
+        ndx, names = read_ndx(open(infile))
+        print names
+        for name, content in ((key, ndx[key]) for key in names) :
+            # Pymol does not like & and | characters
+            name = name.replace("&", "_and_")
+            name = name.replace("|", "_or_")
+            if len(content) > 0 :
+                print "Selection of %s" % name
+                # Pymol does not like long selection strings so I select the
+                # group iteratively
+                cmd.select(name, "index %i" % content[0])
+                subcontents = (content[i:i+10]
+                        for i in xrange(1, len(content), 10))
+                for subcontent in subcontents :
+                    selstring = "index " + "+".join(str(i) for i in subcontent)
+                    cmd.select(name, "%s | %s" % (name, selstring))
+            else :
+                print "Group %s is empty" % name
+        cmd.select("none")
+        print "Loading of %s done" % infile
 
-    Pymol stdout and stderr are printed however if the tests are run using the
-    nose module then the output will be captured for tests that pass.
+    def ndx_save(outfile) :
+        """
+        Save all the selections into a GROMACS index file.
 
-    :Parameters:
-        - outfile : output file name
-    """
-    group_names = cmd.get_names("selections")
-    ndx = {}
-    for group in group_names :
-        storage = {'indices' : []}
-        cmd.iterate(group, 'indices.append(index)', space=storage)
-        ndx[group] = storage['indices']
-    # Pymol will likely have a "sele" group. If this group is empty we do not
-    # want it in the output file.
-    if "sele" in ndx and len(ndx["sele"]) == 0 :
-        del ndx["sele"]
-    write_ndx(ndx, open(outfile, "w"), group_names)
-    print "%s written with %i groups in it." % (outfile, len(group_names))
+        Pymol stdout and stderr are printed however if the tests are run using
+        the nose module then the output will be captured for tests that pass.
 
-# If we are in Pymol then declare the new commands
-if is_pymol :
+        :Parameters:
+            - outfile : output file name
+        """
+        group_names = cmd.get_names("selections")
+        ndx = {}
+        for group in group_names :
+            storage = {'indices' : []}
+            cmd.iterate(group, 'indices.append(index)', space=storage)
+            ndx[group] = storage['indices']
+        # Pymol will likely have a "sele" group. If this group is empty we do
+        # not want it in the output file.
+        if "sele" in ndx and len(ndx["sele"]) == 0 :
+            del ndx["sele"]
+        write_ndx(ndx, open(outfile, "w"), group_names)
+        print "%s written with %i groups in it." % (outfile, len(group_names))
+
+    # Declare the new commands in Pymol
     cmd.extend('ndx_load', ndx_load)
     cmd.extend('ndx_save', ndx_save)
 
