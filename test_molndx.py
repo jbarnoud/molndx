@@ -164,8 +164,12 @@ class TestPlugin(TestCase) :
         with open(tmp, "w") as pml :
             print >> pml, "run molndx.py"
             print >> pml, "quit"
-        status = pymol(tmp)
+        process = Popen(["pymol", "-c", tmp], stdout=PIPE, stderr=STDOUT)
+        status = process.wait()
         self.assertEqual(status, 0, "Problem in loading the plugin in Pymol.")
+        output = process.communicate()[0]
+        print output
+        self.assertFalse("Traceback" in output)
         os.remove(tmp)
 
     def test_write(self) :
