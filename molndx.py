@@ -21,7 +21,7 @@ Pymol selections into an index file.
 
 A GROMACS index file is a succession of atom groups. Each group is described by
 a header defining the group name and a list of atoms. Lines can be commented
-using the # character. Note that the atoms are numbered starting at 1 in the
+using the ; character. Note that the atoms are numbered starting at 1 in the
 index file.
 
 An index file look like :
