@@ -186,7 +186,6 @@ class TestPlugin(TestCase) :
             print >> pml, "ndx_save %s" % tmp_ndx
             print >> pml, "quit"
         status = pymol(tmp)
-        self.assertEqual(status, 0, "Pymol exit status is not 0.")
         index, groups = molndx.read_ndx(open(tmp_ndx))
         ref_index, ref_groups = molndx.read_ndx(
                 open(os.path.join(TEST_DIR, "ref_1BTA.ndx")))
@@ -213,7 +212,6 @@ class TestPlugin(TestCase) :
             print >> pml, "ndx_save %s" % tmp_ndx
             print >> pml, "quit"
         status = pymol(tmp)
-        self.assertEqual(status, 0, "Pymol exit status is not 0.")
         index, groups = molndx.read_ndx(open(tmp_ndx))
         ref_index, ref_groups = molndx.read_ndx(
                 open(os.path.join(TEST_DIR, "ref_1BTA.ndx")))
@@ -240,6 +238,7 @@ def pymol(pml) :
     process = Popen(["pymol", "-c", pml], stdout=PIPE, stderr=STDOUT)
     status = process.wait()
     print process.communicate()[0]
+    assert(status == 0)
     return status
 
 if __name__ == "__main__" :
