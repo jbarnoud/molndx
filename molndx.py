@@ -139,6 +139,9 @@ def ndx_save(outfile) :
     """
     Save all the selections into a GROMACS index file.
 
+    Pymol stdout and stderr are printed however if the tests are run using the
+    nose module then the output will be captured for tests that pass.
+
     :Parameters:
         - outfile : output file name
     """

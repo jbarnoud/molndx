@@ -20,6 +20,7 @@ import os
 import tempfile
 from unittest import TestCase, main
 from copy import copy
+from subprocess import Popen, PIPE, STDOUT
 
 import molndx
 
@@ -69,7 +70,7 @@ class TestMolndx(TestCase) :
         self.assertEqual(len(index), 0, "Dictionary should be empty.")
         self.assertEqual(len(groups), 0, "Group name list should be empty.")
 
-    def test_read_enpty_group(self) :
+    def test_read_empty_group(self) :
         """
         Test reading an empty group
         """
@@ -87,7 +88,7 @@ class TestMolndx(TestCase) :
 
     def test_read_comment_inline(self) :
         """
-        Test reading in presence of comment lines
+        Test reading in presence of inline comments
         """
         file_name = os.path.join(TEST_DIR, "test_index_comment_inline.ndx")
         self.check_content(file_name, self.read_reference, self.group_reference)
@@ -157,7 +158,7 @@ class TestPlugin(TestCase) :
         with open(tmp, "w") as pml :
             print >> pml, "run molndx.py"
             print >> pml, "quit"
-        status = os.system("pymol -c %s" % tmp)
+        status = pymol(tmp)
         self.assertEqual(status, 0, "Problem in loading the plugin in Pymol.")
         os.remove(tmp)
 
@@ -174,7 +175,7 @@ class TestPlugin(TestCase) :
             print >> pml, "run molndx.py"
             print >> pml, "ndx_save %s" % tmp_ndx
             print >> pml, "quit"
-        status = os.system("pymol -c %s" % tmp)
+        status = pymol(tmp)
         index, groups = molndx.read_ndx(open(tmp_ndx))
         ref_index, ref_groups = molndx.read_ndx(
                 open(os.path.join(TEST_DIR, "ref_1BTA.ndx")))
@@ -200,7 +201,7 @@ class TestPlugin(TestCase) :
             print >> pml, "ndx_load %s" % os.path.join(TEST_DIR, "ref_1BTA.ndx")
             print >> pml, "ndx_save %s" % tmp_ndx
             print >> pml, "quit"
-        status = os.system("pymol -c %s" % tmp)
+        status = pymol(tmp)
         index, groups = molndx.read_ndx(open(tmp_ndx))
         ref_index, ref_groups = molndx.read_ndx(
                 open(os.path.join(TEST_DIR, "ref_1BTA.ndx")))
@@ -213,6 +214,21 @@ class TestPlugin(TestCase) :
         os.remove(tmp_ndx)
         os.remove(tmp)
 
+
+def pymol(pml) :
+    """
+    Run pymol in batch mode with a PML file.
+
+    :Paramaters:
+        - pml: the path to the PML file to run Pymol with
+
+    :Returns:
+        - the Pymol exit status
+    """
+    process = Popen(["pymol", "-c", pml], stdout=PIPE, stderr=STDOUT)
+    status = process.wait()
+    print process.communicate()[0]
+    return status
 
 if __name__ == "__main__" :
     main()
