@@ -146,7 +146,7 @@ if __name__ == "pymol" :
         ndx = {}
         for group in group_names :
             storage = {'indices' : []}
-            cmd.iterate(group, 'indices.append(index)', space=storage)
+            cmd.iterate(group, 'indices.append(ID)', space=storage)
             ndx[group] = storage['indices']
         # Pymol will likely have a "sele" group. If this group is empty we do
         # not want it in the output file.
