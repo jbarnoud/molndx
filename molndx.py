@@ -153,7 +153,7 @@ if __name__ == "pymol" :
         if "sele" in ndx and len(ndx["sele"]) == 0 :
             del ndx["sele"]
         write_ndx(ndx, open(outfile, "w"), group_names)
-        print "%s written with %i groups in it." % (outfile, len(group_names))
+        print "%s written with %i groups in it." % (outfile, len(ndx))
 
     # Declare the new commands in Pymol
     cmd.extend('ndx_load', ndx_load)
