@@ -2,7 +2,8 @@
 Molndx
 ======
 
-.. warning:
+.. warning::
+
     The plugin is not working yet. Reading and writing ndx files are working
     but the selection in Pymol does not give the excepted result.
 
