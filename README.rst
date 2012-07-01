@@ -2,11 +2,6 @@
 Molndx
 ======
 
-.. warning::
-
-    The plugin is not working yet. Reading and writing ndx files are working
-    but the selection in Pymol does not give the excepted result.
-
 Molndx is a Pymol plugin to handle GROMACS index files (.ndx). It allows to save selections and to load them.
 
 A GROMACS index file is a succession of atom groups. Each group is described by

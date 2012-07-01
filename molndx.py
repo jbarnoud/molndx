@@ -121,11 +121,11 @@ if __name__ == "pymol" :
                 print "Selection of %s" % name
                 # Pymol does not like long selection strings so I select the
                 # group iteratively
-                cmd.select(name, "index %i" % content[0])
+                cmd.select(name, "id %i" % content[0])
                 subcontents = (content[i:i+10]
                         for i in xrange(1, len(content), 10))
                 for subcontent in subcontents :
-                    selstring = "index " + "+".join(str(i) for i in subcontent)
+                    selstring = "id " + "+".join(str(i) for i in subcontent)
                     cmd.select(name, "%s | %s" % (name, selstring))
             else :
                 print "Group %s is empty" % name
