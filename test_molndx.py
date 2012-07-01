@@ -39,22 +39,6 @@ class TestMolndx(TestCase) :
 
         self.group_reference.sort()
 
-    def check_content(self, infile, reference_dict, reference_list) :
-        """
-        Read an index file and check if its content is the same as the
-        reference.
-
-        :Parameters:
-            - infile: the path to an index file to read
-            - reference_dict: the index dictionary to compare with
-            - reference_list: the group list to compare with
-        """
-        index, groups = molndx.read_ndx(open(infile))
-        self.assertEqual(index, reference_dict,
-                "Incorrect group dictionary.\n%s" % str(index))
-        self.assertEqual(groups, reference_list,
-                "Incorrect group name list.\n%s" % str(groups))
-
     def test_read_regular(self) :
         """
         Test the reading of a regular file
@@ -62,7 +46,7 @@ class TestMolndx(TestCase) :
         Read a file without any strange thing like comments of empty groups.
         """
         file_name = os.path.join(TEST_DIR, "test_index_regular.ndx")
-        self.check_content(file_name, self.read_reference, self.group_reference)
+        check_content(file_name, self.read_reference, self.group_reference)
 
     def test_read_empty_file(self) :
         """
@@ -87,14 +71,14 @@ class TestMolndx(TestCase) :
         Test reading in presence of comment lines
         """
         file_name = os.path.join(TEST_DIR, "test_index_comment_lines.ndx")
-        self.check_content(file_name, self.read_reference, self.group_reference)
+        check_content(file_name, self.read_reference, self.group_reference)
 
     def test_read_comment_inline(self) :
         """
         Test reading in presence of inline comments
         """
         file_name = os.path.join(TEST_DIR, "test_index_comment_inline.ndx")
-        self.check_content(file_name, self.read_reference, self.group_reference)
+        check_content(file_name, self.read_reference, self.group_reference)
 
     def test_read_write_no_groups(self) :
         """
@@ -186,19 +170,10 @@ class TestPlugin(TestCase) :
             print >> pml, "ndx_save %s" % tmp_ndx
             print >> pml, "quit"
         pymol(tmp)
-        index, groups = molndx.read_ndx(open(tmp_ndx))
-        ref_index, ref_groups = molndx.read_ndx(
-                open(os.path.join(TEST_DIR, "ref_1BTA.ndx")))
-        self.assertEqual(index, ref_index, 
-                "Dictionary does not match. See index %s and pml %s." % (
-                    tmp_ndx, tmp))
-        self.assertEqual(groups, ref_groups,
-                "Group list does not match. See index %s and pml %s." % (
-                    tmp_ndx, tmp))
+        compare_ndx(tmp_ndx, os.path.join(TEST_DIR, "ref_1BTA.ndx"))
         os.remove(tmp_ndx)
         os.remove(tmp)
 
-    
     def test_load_write(self) :
         """
         In python, load a file, write the selection and check consistency.
@@ -212,18 +187,39 @@ class TestPlugin(TestCase) :
             print >> pml, "ndx_save %s" % tmp_ndx
             print >> pml, "quit"
         pymol(tmp)
-        index, groups = molndx.read_ndx(open(tmp_ndx))
-        ref_index, ref_groups = molndx.read_ndx(
-                open(os.path.join(TEST_DIR, "ref_1BTA.ndx")))
-        self.assertEqual(index, ref_index, 
-                "Dictionary does not match. See index %s and pml %s." % (
-                    tmp_ndx, tmp))
-        self.assertEqual(groups, ref_groups,
-                "Group list does not match. See index %s and pml %s." % (
-                    tmp_ndx, tmp))
+        compare_ndx(tmp_ndx, os.path.join(TEST_DIR, "ref_1BTA.ndx"))
         os.remove(tmp_ndx)
         os.remove(tmp)
 
+
+def check_content(infile, reference_dict, reference_list) :
+    """
+    Read an index file and check if its content is the same as the
+    reference.
+
+    :Parameters:
+        - infile: the path to an index file to read
+        - reference_dict: the index dictionary to compare with
+        - reference_list: the group list to compare with
+    """
+    index, groups = molndx.read_ndx(open(infile))
+    assert index == reference_dict,\
+            "Incorrect group dictionary.\n%s" % str(index)
+    assert groups == reference_list,\
+            "Incorrect group name list.\n%s" % str(groups)
+
+def compare_ndx(infile_A, infile_B) :
+    """
+    Assert that two ndx files have the same content.
+    """
+    index_A, groups_A = molndx.read_ndx(open(infile_A))
+    index_B, groups_B = molndx.read_ndx(open(infile_B))
+    assert index_A == index_B,\
+            ("Group dictionaries are not matching."
+             "See %s and %s." % (infile_A, infile_B))
+    assert groups_A == groups_B,\
+            ("Group name lists are nor matching."
+             "See %s and %s." % (infile_A, infile_B))
 
 def pymol(pml) :
     """
