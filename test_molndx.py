@@ -148,11 +148,7 @@ class TestPlugin(TestCase) :
         with open(tmp, "w") as pml :
             print >> pml, "run molndx.py"
             print >> pml, "quit"
-        process = Popen(["pymol", "-c", tmp], stdout=PIPE, stderr=STDOUT)
-        status = process.wait()
-        self.assertEqual(status, 0, "Problem in loading the plugin in Pymol.")
-        output = process.communicate()[0]
-        print output
+        status, output = pymol(tmp)
         self.assertFalse("Traceback" in output)
         os.remove(tmp)
 
@@ -190,6 +186,29 @@ class TestPlugin(TestCase) :
         compare_ndx(tmp_ndx, os.path.join(TEST_DIR, "ref_1BTA.ndx"))
         os.remove(tmp_ndx)
         os.remove(tmp)
+
+    def test_internal_external(self) :
+        """
+        Check that there is no regression about issue #2.
+        
+        The system in start.pdb showed that there can be a discrepency between
+        the atom order in the input pdb file and the internal order in Pymol.
+        
+        The order in Pymol can be access through the "index" selection keyword
+        when the PDB order is accessed by the "id" one.
+
+        This test aim to check if the right atoms are selected when the internal
+        and external order are different.
+        """
+        tmp = tempfile.mkstemp(suffix=".pml")[1]
+        with open(tmp, "w") as pml :
+            print >> pml, "load %s/start.pdb" % TEST_DIR
+            print >> pml, "run molndx.py"
+            print >> pml, "ndx_load %s" % os.path.join(TEST_DIR, "layers.ndx")
+            print >> pml, "iterate Top_layer, print name"
+        status, output = pymol(tmp)
+        self.assertEqual(output.count("PO4"), 144,
+            "All the atoms do not have the expected name.")
 
 
 def check_content(infile, reference_dict, reference_list) :
@@ -233,9 +252,10 @@ def pymol(pml) :
     """
     process = Popen(["pymol", "-c", pml], stdout=PIPE, stderr=STDOUT)
     status = process.wait()
-    print process.communicate()[0]
-    assert(status == 0)
-    return status
+    output = process.communicate()[0]
+    print output
+    assert status == 0, "Pymol exit status is not 0"
+    return status, output
 
 if __name__ == "__main__" :
     main()
