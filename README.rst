@@ -2,11 +2,11 @@
 Molndx
 ======
 
-Molndx is a Pymol plugin to handle GROMACS index files (.ndx). It allows to save selections and to load them.
+Molndx is a Pymol plugin to handle GROMACS index files (.ndx). It allows to save selections and to load them in Pymol.
 
 A GROMACS index file is a succession of atom groups. Each group is described by
 a header defining the group name and a list of atoms. Lines can be commented
-using the # character. Note that the atoms are numbered starting at 1 in the
+using the ; character. Note that the atoms are numbered starting at 1 in the
 index file.
 
 An index file look like :
@@ -34,6 +34,17 @@ The plugin gives access to two methods :
 
 - ndx_save <output_file> : save all selections
 - ndx_load <input_file> : load the selections
+
+Unit tests
+==========
+
+A test suite is provided with molndx. To run it you can just execute the test_molndx.py script. However using the nosetest program is more convenient. Run
+
+    nosetest -v test_moldnx
+
+in the molndx directory.
+
+The nose module can be found at https://github.com/nose-devs/nose and its documentation at http://nose.readthedocs.org/en/latest/.
 
 Licence
 =======
