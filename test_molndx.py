@@ -209,6 +209,7 @@ class TestPlugin(TestCase) :
         status, output = pymol(tmp)
         self.assertEqual(output.count("PO4"), 144,
             "All the atoms do not have the expected name.")
+        os.remove(tmp)
 
 
 def check_content(infile, reference_dict, reference_list) :
