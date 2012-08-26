@@ -142,7 +142,7 @@ if __name__ == "pymol" :
         :Parameters:
             - outfile : output file name
         """
-        group_names = cmd.get_names("selections")
+        group_names = cmd.get_names("public_selections")
         ndx = {}
         for group in group_names :
             storage = {'indices' : []}
